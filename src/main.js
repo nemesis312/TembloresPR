@@ -17,7 +17,7 @@ Vue.use(VueRouter,axios,VueAxios);
 
 const routes = [
   {path: '/temblores', component: Temblores},
-  {path: '/', component: App}
+  {path: '/', redirect: 'temblores'}
 
 ];
 
