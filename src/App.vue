@@ -3,6 +3,7 @@
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <h1>Temblores PR</h1>
     <router-view></router-view>
+    <h4 style="margin-top:50px">Created By Lesther Ruiz</h4>
   </div>
 </template>
 

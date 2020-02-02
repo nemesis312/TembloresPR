@@ -29,15 +29,16 @@ export default {
     methods: {
         getData() {
             var _records = []
-			var _this = this
-			var url = 'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + this.startdate + '&endtime=' + this.enddate + '&latitude=18.220&longitude=-66.590&maxradiuskm=150';
-			
+            var _this = this
+            var url = 'https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=' + this.startdate + '&endtime=' + this.enddate + '&latitude=18.220&longitude=-66.590&maxradiuskm=150';
+
             axios.get(url)
                 .then(response => {
                     response.data.features.forEach(function (item) {
                         item.properties.time = _this.formatDate(item.properties.time)
                         item.properties.updated = _this.formatDate(item.properties.updated)
                         item.properties.tsunami = _this.formatTsunami(item.properties.tsunami)
+                        item.properties.depth = item.geometry.coordinates[2]
                         _records.push(item.properties)
                     });
 
@@ -95,50 +96,53 @@ export default {
             } catch (e) {
                 console.error(e)
             }
-		},
-		getDates(x){
-			
-			var date = new Date(), y = date.getFullYear(), m = date.getMonth();
-			if(x == 'F')
-			{
-				var firstday = new Date(y, m, 1);
-				
-				return  moment(firstday).format("YYYY-MM-DD")
-			}
-			else if(x == 'F5'){
-				var today = new Date();				
-				var last5 = new Date().setDate(today.getDate()-5)				
-				return  moment(last5).format("YYYY-MM-DD")
-			}
-			else if(x == 'L5'){
-				var today = new Date();
-				var today1 = new Date().setDate(today.getDate()+1)			
-				return  moment(today1).format("YYYY-MM-DD")
-			}		
-			else
-			{
-				var lastday = new Date(y, m + 1, 0);				
-				return  moment(lastday).format("YYYY-MM-DD")
-			}
+        },
+        getDates(x) {
 
-			
-		}
+            var date = new Date(),
+                y = date.getFullYear(),
+                m = date.getMonth();
+            if (x == 'F') {
+                var firstday = new Date(y, m, 1);
+
+                return moment(firstday).format("YYYY-MM-DD")
+            } else if (x == 'F5') {
+                var today = new Date();
+                var last5 = new Date().setDate(today.getDate() - 5)
+                return moment(last5).format("YYYY-MM-DD")
+            } else if (x == 'L5') {
+                var today = new Date();
+                var today1 = new Date().setDate(today.getDate() + 1)
+                return moment(today1).format("YYYY-MM-DD")
+            } else {
+                var lastday = new Date(y, m + 1, 0);
+                return moment(lastday).format("YYYY-MM-DD")
+            }
+
+        }
     },
     data() {
         return {
-			startdate: this.getDates("F5"),
-			enddate: this.getDates("L5"),
-			loaded: false,
+            startdate: this.getDates("F5"),
+            enddate: this.getDates("L5"),
+            loaded: false,
             chartdata: null,
             records: null,
-            columns: ['mag', 'place', 'time', 'tsunami'],
+            columns: ['mag', 'place', 'time', 'depth', 'tsunami', 'url'],
             tableData: [],
             options: {
+                templates: {
+                    url: function (h, row, index) {
+                        return <a href={row.url+'/map'} target="_blank">Presione aqui</a>
+                    }
+                },
                 headings: {
-                    mag: 'Mag',
-                    place: 'Lugares',
+                    mag: 'Magnitud',
+                    place: 'Lugar',
                     time: 'Fecha',
-                    tsunami: 'Alerta de Tsunami'
+                    tsunami: 'Alerta de Tsunami',
+                    depth: 'Profundidad',
+                    url: 'Mapa'
                 },
                 texts: {
                     filterPlaceholder: "Por Magnitud"
