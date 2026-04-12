@@ -12,7 +12,6 @@
 
 <script>
 import LineChart from "./Chart.vue";
-import axios from "axios";
 import moment from "moment";
 import { _ } from "vue-underscore";
 
@@ -39,10 +38,15 @@ export default {
         this.enddate +
         "&latitude=18.220&longitude=-66.590&maxradiuskm=150";
 
-      axios
-        .get(url)
+      fetch(url)
         .then((response) => {
-          response.data.features.forEach(function (item) {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          data.features.forEach(function (item) {
             item.properties.time = _this.formatDate(item.properties.time);
             item.properties.updated = _this.formatDate(item.properties.updated);
             item.properties.tsunami = _this.formatTsunami(
